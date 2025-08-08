@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ![Party Parrot](./party-parrot.gif)
 
 ### Changed
-- N/A
+- Added dependabot.yml for actions
 
 ### Deprecated
 - N/A
@@ -25,10 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - N/A
 
 ### Fixed
-- N/A
+- dependabot.yml
 
 ### Security
-- N/A
+- tight
 
 ## [1.0.0] - 2025-08-07
 
