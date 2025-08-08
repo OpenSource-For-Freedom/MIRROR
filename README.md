@@ -1,6 +1,12 @@
-# MIRROR
-Testing Repo for Github DevOps
+<div align="center">
 
-![Party Parrot](./party-parrot.gif)
+# MIRROR  
+Testing Repo for Github DevOps  
+
+<img src="./world.GIF" alt="world gif" />
+
+<img src="./party-parrot.gif" alt="Party Parrot" />
 
 🎉 Let's get this party started! 🎉
+
+</div>
