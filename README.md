@@ -1,7 +1,8 @@
 <div align="center">
 
 # MIRROR  
-Testing Repo for Github DevOps  
+Testing Repo for Github DevOps 
+- [![ci](https://github.com/OpenSource-For-Freedom/MIRROR/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenSource-For-Freedom/MIRROR/actions/workflows/ci.yml)
 
 <img src="./world.GIF" alt="world gif" />
 
