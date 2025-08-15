@@ -9,9 +9,3 @@ Testing Repo for Github DevOps
 <img src="./party-parrot.gif" alt="Party Parrot" />
 
 🎉 Let's get this party started! 🎉
-
-## Test
-
-- |
-- |
-
