@@ -8,16 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [RELEASED]
 
 ### Added
-- Initial repository setup
-- README.md with project description
-- CHANGELOG.md for tracking project changes
-- Party parrot image to celebrate the project launch! 🎉
 
 ![Party Parrot](./party-parrot.gif)
 
 
 ### Changed
-- Added dependabot.yml for actions
 - Updated CHANGELOG.md to reflect RELEASE
 
 ### Deprecated
@@ -27,12 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - N/A
 
 ### Fixed
-- dependabot.yml
+- 
 
 ### Security
 - tight
 
-## [1.0.4] - 2025-08-12
+## [1.0.5] - 2025-08-14
 
 ### Added
 - Additional CHANGELOG information 
