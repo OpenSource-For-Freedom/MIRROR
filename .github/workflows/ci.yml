@@ -1,0 +1,103 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-release-main
+  cancel-in-progress: false
+
+jobs:
+  tag_and_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next tag (increaseing at +0.01)
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Get most recently created tag (any format). Falls back to none and will start new
+          current_tag=$(git for-each-ref --sort=-creatordate --format '%(refname:strip=2)' refs/tags | head -n 1 || true)
+
+          # Split the tag into: prefix + numeric + suffix
+          prefix=""; num=""; suffix=""
+          if [[ -n "${current_tag}" ]]; then 
+          #regex from Ken : )
+            if [[ "${current_tag}" =~ ^([^0-9]*)([0-9]+([.][0-9]+)?)(.*)$ ]]; then
+              prefix="${BASH_REMATCH[1]}"
+              num="${BASH_REMATCH[2]}"
+              suffix="${BASH_REMATCH[4]}"
+            else
+              # No num portion in the latest tag- preserve it as prefix like 1.0.1 etc. 
+              prefix="${current_tag}"
+              num="0.00"
+              suffix=""
+            fi
+          else
+            num="0.00"
+          fi
+
+          # Normalize to two decimals and convert to integer cents.
+          if [[ "${num}" == *.* ]]; then
+            int_part="${num%%.*}"
+            frac_part="${num#*.}"
+          else
+            int_part="${num}"
+            frac_part=""
+          fi
+          # Ensure two digits are there
+          frac_part=$(printf "%-02s" "${frac_part}" | tr ' ' '0' | cut -c1-2)
+
+          # Strip leading zeros in int via arithmetic with base-10
+          int_val=$((10#${int_part}))
+          cents=$((int_val * 100 + 10#${frac_part}))
+
+          # Bump by 1 cent (0.01)
+          cents=$((cents + 1))
+
+          new_int=$((cents / 100))
+          new_frac=$(printf "%02d" $((cents % 100)))
+          new_num="${new_int}.${new_frac}"
+
+          new_tag="${prefix}${new_num}${suffix}"
+
+          echo "current_tag=${current_tag:-none}"
+          echo "new_tag=${new_tag}"
+
+          echo "current_tag=${current_tag:-none}" >> "$GITHUB_OUTPUT"
+          echo "new_tag=${new_tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.version.outputs.new_tag }}"
+          git tag -a "$tag" -m "Release $tag"
+          git push origin "$tag"
+
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: ${{ steps.version.outputs.new_tag }}
+          generate_release_notes: true
