@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5<<< be sure to have th emost updated runner version to use this. 
         with:
           fetch-depth: 0
 
@@ -70,7 +70,7 @@ jobs:
           cents=$((int_val * 100 + 10#${frac_part}))
 
           # Bump by 1 cent (0.01)
-          cents=$((cents + 1))
+          cents=$((cents + .1))
 
           new_int=$((cents / 100))
           new_frac=$(printf "%02d" $((cents % 100)))
@@ -94,7 +94,7 @@ jobs:
 
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 #v2.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
