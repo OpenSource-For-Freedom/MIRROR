@@ -83,7 +83,7 @@ jobs:
 
           echo "current_tag=${current_tag:-none}" >> "$GITHUB_OUTPUT"
           echo "new_tag=${new_tag}" >> "$GITHUB_OUTPUT"
-
+       # push based on latest tag = .01+
       - name: Create and push tag
         shell: bash
         run: |
