@@ -1,6 +1,8 @@
-name: Cooking Robot 
+name: Cooking robot
 
 on:
+  schedule:
+    - cron: "15 12 * * 1-5"   # 12:15 UTC Mon–Fri
   workflow_dispatch:
 
 permissions:
@@ -19,6 +21,7 @@ jobs:
       - name: Configure git
         run: |
           set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -29,66 +32,46 @@ jobs:
           git checkout -B main origin/main
           git reset --hard origin/main
 
-      - name: Update bin/bot.sh with recipes
+      - name: Run recipe script to update bin/bot.sh
         run: |
           set -euo pipefail
-          mkdir -p bin
-          cat > bin/bot.sh <<'EOF'
-              #!/usr/bin/env bash
+          chmod +x .github/scripts/recipe.sh
+          .github/scripts/recipe.sh
 
-              # ./bin/bot.sh <recipe> to push a cooking recipe forced style
-              set -euo pipefail
-              recipe_pancakes(){ cat <<TXT
-              Fluffy Pancakes
-              Ingredients:
-              - 1 cup flour
-              - 2 tbsp sugar
-              - 2 tsp baking powder
-              - 1/4 tsp salt
-              - 1 cup milk
-              - 1 egg
-              - 2 tbsp melted butter
-              Steps:
-              1) Whisk dry.
-              2) Add wet, mix just until combined.
-              3) Cook 2–3 min/side on medium.
-              TXT
-              }
-              recipe_garlic_pasta(){ cat <<TXT
-              Garlic Butter Pasta
-              Ingredients:
-              - 8 oz pasta
-              - 3 tbsp butter
-              - 3 cloves garlic, minced
-              - 1/4 cup grated parmesan
-              - Salt, pepper, parsley
-              Steps:
-              1) Boil pasta.
-              2) Melt butter, sauté garlic 30s.
-              3) Toss pasta + parmesan; season.
-              TXT
-              }
-              main(){
-                case "${1:-}" in
-                  pancakes) recipe_pancakes ;;
-                  garlic-pasta|garlic_pasta) recipe_garlic_pasta ;;
-                  *) echo "Recipes: pancakes, garlic-pasta" >&2; exit 2 ;;
-                esac
-              }
-              main "$@"
-              EOF
-          chmod +x bin/bot.sh
+      - name: Show diff and commit
+        run: |
+          set -euo pipefail
+          git status --porcelain
+          git --no-pager diff -- bin/bot.sh | sed -n '1,200p' || true
           git add bin/bot.sh
-          git commit -m "feat(recipes): update bin/bot.sh" || echo "No changes to commit"
+          if git diff --cached --quiet; then
+            echo "No changes to commit (bin/bot.sh unchanged)."; exit 0
+          fi
+          git commit -m "feat(recipes): update bin/bot.sh via script"
 
-      - name: Set remote to use PAT
+      - name: Set remote for PAT
+        if: ${{ success() }}
         env:
           PAT: ${{ secrets.GIT_FORCE }}
         run: |
           set -euo pipefail
+          test -n "${PAT}" || (echo "::error::GIT_FORCE secret is empty"; exit 1)
           git remote set-url origin "https://x-access-token:${PAT}@github.com/${{ github.repository }}.git"
 
       - name: Force push to main (porcelain)
+        if: ${{ success() }}
         run: |
           set -euo pipefail
-          git push --force --porcelain origin HEAD:main
+          old="$(git ls-remote --heads origin main | awk '{print $1}')"
+          echo "Old remote main: $old"
+          # using porcelain for clean log output
+          out="$(git push --force --porcelain origin HEAD:main 2>&1)"
+          echo "$out"
+          if echo "$out" | grep -qiE 'rejected|GH013|protected branch|hook declined'; then
+            echo "::error::Force push blocked by ruleset/branch protection"; exit 1
+          fi
+          new="$(git ls-remote --heads origin main | awk '{print $1}')"
+          echo "New remote main: $new"
+          if [ "$old" = "$new" ]; then
+            echo "::error::Remote main did not change"; exit 1
+          fi
