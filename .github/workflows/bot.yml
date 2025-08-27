@@ -1,32 +1,113 @@
-name: Force Update Bot
+name: Force Update bot.sh Recipes (PAT)
 
 on:
-  workflow_dispatch:   
+  workflow_dispatch: {}
 
 permissions:
-  contents: write    
+  contents: write
 
 jobs:
   force-update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout full history
+      - name: Checkout (no default creds)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # required to allow force
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Configure git
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create dummy commit
+      - name: Sync to latest main
         run: |
-          echo "testing -- force $(date)" > force-test.txt
-          git add force-test.txt
-          git commit -m "testing -- force"
+          git fetch origin main
+          git checkout -B main origin/main
+          git reset --hard origin/main
 
-      - name: Force push to main
+      - name: Update bin/bot.sh with recipes
         run: |
-          git push origin HEAD:main --force
+          mkdir -p bin
+          cat > bin/bot.sh <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+recipe_pancakes() {
+  cat <<TXT
+Fluffy Pancakes
+Ingredients:
+- 1 cup flour
+- 2 tbsp sugar
+- 2 tsp baking powder
+- 1/4 tsp salt
+- 1 cup milk
+- 1 egg
+- 2 tbsp melted butter
+Steps:
+1) Whisk dry.
+2) Add wet, mix just until combined.
+3) Cook 2–3 min/side on medium.
+TXT
+}
+
+recipe_garlic_pasta() {
+  cat <<TXT
+Garlic Butter Pasta
+Ingredients:
+- 8 oz pasta
+- 3 tbsp butter
+- 3 cloves garlic, minced
+- 1/4 cup grated parmesan
+- Salt, pepper, parsley
+Steps:
+1) Boil pasta in a pot.
+2) Melt butter, and sere (light brown) garlic 30s.
+3) Toss pasta + parmesan; season witha. super salty mix.
+TXT
+}
+
+main() {
+  case "${1:-}" in
+    pancakes) recipe_pancakes ;;
+    garlic-pasta|garlic_pasta) recipe_garlic_pasta ;;
+    *)
+      echo "Recipes: pancakes, garlic-pasta" >&2
+      exit 2
+      ;;
+  esac
+}
+main "$@"
+EOF
+          chmod +x bin/bot.sh
+
+      - name: Commit changes (if any)
+        run: |
+          git add bin/bot.sh
+          git commit -m "feat(recipes): update bin/bot.sh" || echo "No changes to commit"
+
+      - name: Set remote to use PAT
+        env:
+          PAT: ${{ secrets.GIT_FORCE }}
+        run: |
+          git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}.git
+
+      - name: Force push to main (porcelain)
+        id: push
+        run: |
+          set -o pipefail
+          out="$(git push --force --porcelain origin HEAD:main 2>&1 | tee /dev/stderr)"
+          echo "out<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$out" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Verify result / fail on ruleset block
+        run: |
+          if echo "${{ steps.push.outputs.out }}" | grep -qiE 'rejected|GH013|protected branch'; then
+            echo "Force push blocked by ruleset/branch protection."
+            exit 1
+          fi
+          echo "Force push succeeded."
