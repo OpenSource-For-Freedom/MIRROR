@@ -11,21 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ![Party Parrot](./party-parrot.gif)
 
-
 ### Changed
-- Updated CHANGELOG.md to reflect RELEASE
+- added `ci.yml` for testing and simulated actions usage with dependabot. 
 
 ### Deprecated
 - N/A
 
 ### Removed
-- branch release-1
+- N/A
 
 ### Fixed
-- version.yml
+- N/A
 
 ### Security
-- tight
+- updated
 
 ## [1.0.5] - 2025-08-14
 
