@@ -1,4 +1,4 @@
-name: Force Update bot.sh (PAT)
+name: Cooking Robot 
 
 on:
   workflow_dispatch:
