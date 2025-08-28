@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x .github/scripts/recipe.sh
-          .github/scripts/recipe.sh
+          .github/scripts/recipe.sh garlic-pasta
 
       - name: Show diff and commit
         run: |
