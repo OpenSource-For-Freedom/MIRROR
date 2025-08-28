@@ -73,5 +73,5 @@ jobs:
           new="$(git ls-remote --heads origin main | awk '{print $1}')"
           echo "New remote main: $new"
           if [ "$old" = "$new" ]; then
-            echo "::error::Remote main did not change"; exit 1
+            echo "Remote main did not change; nothing to push."; exit 0
           fi
