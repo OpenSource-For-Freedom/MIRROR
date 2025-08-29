@@ -15,6 +15,7 @@
 # -----------------------------------------------------------------------------
 ##################################################################
 ###################################################################
+###### FORCE
 echo "[*] Starting MIRROR bot.sh test script..."
 echo "[*] This script is for educational and security testing purposes only."
 echo "[*] It does NOT execute any malicious actions — it only writes *strings*"
