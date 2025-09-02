@@ -35,8 +35,6 @@ Steps:
 TXT
 }
 
-##### test test######
-
 main(){
   case "${1:-}" in
     pancakes) recipe_pancakes ;;
