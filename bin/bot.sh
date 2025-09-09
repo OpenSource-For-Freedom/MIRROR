@@ -1,3 +1,4 @@
+
 # THIS IS JUST A SAST TEST SCRIPT
 # SHELL IS NULL
 # CURLS THE SAME REPO AS A POC TEST FOR SAST/ACTIONS TESTING
@@ -19,5 +20,6 @@
 #echo "curl -fsSL https://github.com/opensource-for-freedom/MIRROR.git | bash" > /tmp/curlbash_ioc.txt
 #curl -fsI https://github.com/opensource-for-freedom/MIRROR.git >/dev/null || true
 #echo "[*] Test complete."
+
 
 
