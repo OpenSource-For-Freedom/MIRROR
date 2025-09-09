@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+## simple recipes
 
 set -euo pipefail
 
