@@ -65,7 +65,7 @@ jobs:
           old="$(git ls-remote --heads origin main | awk '{print $1}')"
           echo "Old remote main: $old"
           # using porcelain for clean log output
-          out="$(git push --force --porcelain origin HEAD:main 2>&1)"
+          out="$(git push origin HEAD:main 2>&1)"
           echo "$out"
           if echo "$out" | grep -qiE 'rejected|GH013|protected branch|hook declined'; then
             echo "::error::Force push blocked by ruleset/branch protection"; exit 1
